@@ -93,12 +93,17 @@ public class SensorWriter {
 		Date now = new Date();
 		double hum = 0.0;
 		double temp = 0.0;
-		for (int i = 0; i < 10; i++) {
+		String string ="";
+		for (int i = 0; i < 20; i++) {
 			try {
 				temp = (Math.random()*5);
 				hum = 5+ (Math.random()*5);
 				now = new Date();
-				String string = String.format("{\"temperature\":\"%s\", \"humidity\": \"%s\", \"date\": \"%s\", \"time\": \"%s\"}", df.format(temp),df.format(hum),sdf1.format(now),sdf2.format(now));
+				if ((i%2)==0) {
+					 string = String.format("{\"temperature\":\"%s\", \"humidity\": \"%s\", \"date\": \"%s\", \"time\": \"%s\"}", df.format(temp),df.format(hum),sdf1.format(now),sdf2.format(now));
+				}else {
+					 string = String.format("{\"temperature\":\"%s\", \"humidity\": \"%s\", \"date\": \"%s\", \"time\": \"%s\"}", df.format(temp),df.format(hum),sdf1.format(now),sdf2.format(now));
+				}
 				publishMessage(string);
 				TimeUnit.SECONDS.sleep(5);
 			} catch (InterruptedException e) {
