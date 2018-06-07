@@ -2,10 +2,12 @@ package MongoConnection;
 
 
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mongodb.BasicDBObject;
@@ -51,14 +53,22 @@ public class MongoConnection {
 			boolean verifier = verifyMessage(x);
 			if (verifier) {
 				//Construção de um dado em formato MongoDB
-				BasicDBObject messageMongo = new BasicDBObject()
-													.append("temperature", x.get("temperature").toString().replace(",", "."))
-													.append("humidity", x.get("humidity").toString().replace(",", "."))
-													.append("date", x.get("date").toString().replace("/", "-"))
-													.append("time", x.get("time").toString());
-				//Insert do dado criado na base de dados
-				table.insert(messageMongo);
-				System.out.println("Mensagem Enviada");
+				BasicDBObject messageMongo;
+				try {
+					messageMongo = new BasicDBObject()
+														.append("temperature", x.get("temperature").toString().replace(",", "."))
+														.append("humidity", x.get("humidity").toString().replace(",", "."))
+														.append("date", sdf1.format(sdf1.parse(x.get("date").toString())).replace("/", "-"))
+														.append("time", sdf2.format(sdf2.parse(x.get("time").toString())));
+					table.insert(messageMongo);
+					System.out.println("Mensagem Enviada");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} else {
 				System.out.println("Mensagem Descartada");
 			}
