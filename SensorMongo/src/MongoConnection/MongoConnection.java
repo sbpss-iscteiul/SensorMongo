@@ -2,6 +2,7 @@ package MongoConnection;
 
 
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,7 +17,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
-import com.mongodb.ServerAddress;
 
 public class MongoConnection {
 	
@@ -26,6 +26,7 @@ public class MongoConnection {
 	
 	private SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
 	private SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm:ss");
+	private DateFormat df3 = new SimpleDateFormat("dd/MM/yyyy");
 	
 	public MongoConnection() {
 		System.out.println("Connection Process Beginning");
@@ -53,19 +54,17 @@ public class MongoConnection {
 			boolean verifier = verifyMessage(x);
 			if (verifier) {
 				//Construção de um dado em formato MongoDB
-				BasicDBObject messageMongo;
 				try {
-					messageMongo = new BasicDBObject()
-														.append("temperature", x.get("temperature").toString().replace(",", "."))
-														.append("humidity", x.get("humidity").toString().replace(",", "."))
-														.append("date", sdf1.format(sdf1.parse(x.get("date").toString())).replace("/", "-"))
-														.append("time", sdf2.format(sdf2.parse(x.get("time").toString())));
+					Date dateD = df3.parse(x.get("date").toString());
+					BasicDBObject messageMongo = new BasicDBObject()
+							.append("temperature", x.get("temperature").toString().replace(",", "."))
+							.append("humidity", x.get("humidity").toString().replace(",", "."))
+							.append("date", sdf1.format(dateD).replaceAll("/", "-"))
+							.append("time", x.get("time").toString());
+					//Insert do dado criado na base de dados
 					table.insert(messageMongo);
 					System.out.println("Mensagem Enviada");
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ParseException e) {
+				} catch (JSONException | ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -79,9 +78,10 @@ public class MongoConnection {
 		//	Verificado se estão preenchidos
 		//	Verificado se estão nos formatos correctos 
 		try {
+			
 			Double humD = Double.parseDouble(x.get("temperature").toString().replace(",", "."));
 			Double tempD = Double.parseDouble(x.get("humidity").toString().replace(",", "."));
-			Date dateD = sdf1.parse(x.get("date").toString());
+			Date dateD = df3.parse(x.get("date").toString());
 			Date timeD = sdf2.parse(x.get("time").toString());
 		}catch (Exception e) {
 			return false;
