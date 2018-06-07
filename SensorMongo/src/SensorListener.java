@@ -21,16 +21,21 @@ public class SensorListener {
 	
 	public SensorListener(){
         try {
+        	//Definir a ligação 
             sampleClient = new MqttClient(broker, clientId, persistence);
             connOpts = new MqttConnectOptions();
+            
             connOpts.setCleanSession(true);
             
+            //Implementação do Callback
             callback = new MqttCallback() {
 				
 				@Override
 				public void messageArrived(String arg0, MqttMessage arg1) throws Exception {
-					System.out.println("Data");
-					mongoConnection.insertData(arg1);
+					//Caso exista uma ligação estabelecida ao mongo
+					//é realizado o insert
+					if(mongoConnection.isConnected())
+						mongoConnection.insertData(arg1);
 				}
 				
 				@Override
@@ -42,9 +47,11 @@ public class SensorListener {
 				@Override
 				public void connectionLost(Throwable arg0) {
 					System.out.println("connectionLost");
+					//Força uma nova ligação
+					connect();
 				}
 			};
-			
+			//Ligação ao Mongo
 			mongoConnection = new MongoConnection();
 
         } catch(MqttException me) {
@@ -60,14 +67,19 @@ public class SensorListener {
 	public void connect() {
 			try {
 	        	System.out.println("Connecting to broker: "+broker);
+	        	//Estabelecer Ligação ao Servidor
 				sampleClient.connect(connOpts);
 				System.out.println("Connected");
 				
+				//Definir a interface Callback
 				sampleClient.setCallback(callback);
 	            
+				//Subscrever o Topico escolhido
 				sampleClient.subscribe(topic);
 				
 				System.out.println("Subscribed to: "+topic);
+				
+//				...
 				
 			} catch(MqttException me) {
 	            System.out.println("reason "+me.getReasonCode());

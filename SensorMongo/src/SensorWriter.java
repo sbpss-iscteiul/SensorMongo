@@ -94,7 +94,7 @@ public class SensorWriter {
 		double hum = 0.0;
 		double temp = 0.0;
 		String string ="";
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 60; i++) {
 			try {
 				temp = (Math.random()*5);
 				hum = 5+ (Math.random()*5);
@@ -102,10 +102,11 @@ public class SensorWriter {
 				if ((i%2)==0) {
 					 string = String.format("{\"temperature\":\"%s\", \"humidity\": \"%s\", \"date\": \"%s\", \"time\": \"%s\"}", df.format(temp),df.format(hum),sdf1.format(now),sdf2.format(now));
 				}else {
-					 string = String.format("{\"temperature\":\"%s\", \"humidity\": \"%s\", \"date\": \"%s\", \"time\": \"%s\"}", df.format(temp),df.format(hum),sdf1.format(now),sdf2.format(now));
+					 string = String.format("{\"temperature\":\"%s\", \"humidity\": \"%s\", \"date\": \"%s\", \"time\": \"%s\"}", /*df.format(temp)*/"abc",df.format(hum),sdf1.format(now),sdf2.format(now));
 				}
+				System.out.println("Mensagem Nr "+i);
 				publishMessage(string);
-				TimeUnit.SECONDS.sleep(5);
+				TimeUnit.SECONDS.sleep(2);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
